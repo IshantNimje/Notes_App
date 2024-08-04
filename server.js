@@ -6,13 +6,24 @@ require('dotenv').config();
 
 const app = express();
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors(
+  {
+    origin: ["https://notes-app-taupe-tau.vercel.app"],
+    methods: ["POST", "GET"],
+    credentials: true
+  }
+));
 
 const mongoURI = process.env.MONGO_URI;
 
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+})
+.then(() => console.log('MongoDB connected...'))
+.catch(err => {
+  console.error('MongoDB connection error:', err);
+  process.exit(1);
 });
 
 const noteSchema = new mongoose.Schema({
@@ -25,6 +36,7 @@ const noteSchema = new mongoose.Schema({
 const Note = mongoose.model('Note', noteSchema);
 
 app.post('/api/notes', async (req, res) => {
+  try{
   const { title, description, date, category } = req.body;
   const newNote = new Note({
     title,
@@ -34,29 +46,48 @@ app.post('/api/notes', async (req, res) => {
   });
   await newNote.save();
   res.json({ message: 'Data has been inserted successfully' });
+}catch (err) {
+  console.error('Error inserting data:', err);
+  res.status(500).json({ error: 'Internal Server Error' });
+}
 });
 
 app.get('/api/notes', async (req, res) => {
-  const notes = await Note.find();
-  res.json(notes);
+  try {
+    const notes = await Note.find();
+    res.json(notes);
+  } catch (err) {
+    console.error('Error fetching data:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 app.put('/api/notes/:id', async (req, res) => {
-  const { id } = req.params;
-  const { title, description, date, category } = req.body;
-  await Note.findByIdAndUpdate(id, {
-    title,
-    description,
-    date,
-    category,
-  });
-  res.json({ message: 'Data has been edited successfully' });
+  try {
+    const { id } = req.params;
+    const { title, description, date, category } = req.body;
+    await Note.findByIdAndUpdate(id, {
+      title,
+      description,
+      date,
+      category,
+    });
+    res.json({ message: 'Data has been edited successfully' });
+  } catch (err) {
+    console.error('Error editing data:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 app.delete('/api/notes/:id', async (req, res) => {
-  const { id } = req.params;
-  await Note.findByIdAndDelete(id);
-  res.json({ message: 'Data has been deleted successfully' });
+  try {
+    const { id } = req.params;
+    await Note.findByIdAndDelete(id);
+    res.json({ message: 'Data has been deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting data:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 app.listen(3000, () => {
