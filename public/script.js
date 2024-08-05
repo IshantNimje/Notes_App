@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const category = document.getElementById('category').value;
       const description = document.getElementById('description').value;
   
-      const response = await fetch('/api/notes', {
+      const response = await fetch('/notes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, date, category, description })
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   
     async function fetchNotes() {
-      const response = await fetch('/api/notes');
+      const response = await fetch('/notes');
       const notes = await response.json();
       notesContainer.innerHTML = '';
       notes.forEach(note => {
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const date = prompt('Enter new date:');
       const category = prompt('Enter new category:');
   
-      const response = await fetch(`/api/notes/${id}`, {
+      const response = await fetch(`/notes/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, description, date, category })
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   
     window.deleteNote = async function (id) {
-      const response = await fetch(`/api/notes/${id}`, {
+      const response = await fetch(`/notes/${id}`, {
         method: 'DELETE'
       });
   
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
     searchInput.addEventListener('input', async () => {
       const query = searchInput.value.toLowerCase();
-      const response = await fetch('/api/notes');
+      const response = await fetch('/notes');
       const notes = await response.json();
       const filteredNotes = notes.filter(note =>
         note.title.toLowerCase().includes(query) ||
