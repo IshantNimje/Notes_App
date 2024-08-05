@@ -6,13 +6,7 @@ require('dotenv').config();
 
 const app = express();
 app.use(bodyParser.json());
-app.use(cors(
-  {
-    origin: ["https://notes-app-taupe-tau.vercel.app"],
-    methods: ["POST", "GET"],
-    credentials: true
-  }
-));
+app.use(cors());
 
 const mongoURI = process.env.MONGO_URI;
 
